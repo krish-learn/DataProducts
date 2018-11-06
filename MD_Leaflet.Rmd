@@ -1,0 +1,48 @@
+---
+title: R Markdown and Leaflet
+author: "KK"
+date: "November 5, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Instructions
+Create a web page using R Markdown that features a map created with Leaflet.
+
+Host your webpage on either GitHub Pages, RPubs, or NeoCities.
+
+Your webpage must contain the date that you created the document, and it must contain a map created with Leaflet. We would love to see you show off your creativity!
+
+# Solution
+Here is an attempt to map the top 10 Fastest growing cities in the US. The data with latitude and longitude details is downloaded from www.statcrunch.com Metropolitan Statistical Areas in the U.S. - Poplulation, Location. While the data for fastest growing cities comes from worldatlas.com
+***
+
+```{r uscitiesmap}
+    setwd("C:/Users/Raman/Documents/AI/JHU_DataScience/DataProducts")
+    uscities <- read.csv(file = "FastestGrowingCities.csv")
+    uscities_sub <- subset(uscities, select = c("Rank", "MSA", "Pop2013","Latitude", "Longitude"))
+    colnames(uscities_sub) <- c("Rank","name", "population", "latitude", "longitude")
+    
+    uscities_sub$popsep <- format(uscities_sub$population, big.mark=",",scientific=FALSE)
+    uscities_sub$metropop <- do.call(paste, c(uscities_sub[c("Rank", "name", "popsep")]))
+    
+```
+
+## Using Leaflet package
+
+
+```{r leaflet, echo=TRUE}
+    library(leaflet)
+    myus_map <- uscities_sub %>%
+        leaflet() %>%
+        addTiles() %>%
+        addCircles(weight = 3, radius = (uscities_sub$population)/50, popup = strwrap(uscities_sub$metropop))
+    
+    myus_map
+    
+```
+
+
